@@ -147,3 +147,46 @@ simulate_results_df_2 %>%
 ```
 
 By comparing the two lines in the plot above, it is clear that the sample average of estimated $\mu$ across tests where the null hypothesis was rejected is not approximately equal to the true value of $\mu$. The line representing the sample average of estimated $\mu$ for tests where the null hypothesis was rejected is slightly higher than the average estimate of $\mu$ for the samples when the true value of $\mu$ is 1, 2, 3, and 4. This occurs because the samples where the null hypothesis was rejected tend to have higher estimates of  $\mu$. In these cases, the 95% confidence intervals of these samples generally do not include 0, pulling their average estimate of $\mu$ farther from 0. Consequently, the samples that reject the null hypothesis have a higher average estimate of $\mu$.
+
+# Problem 3
+## (a)
+```{r message = FALSE, warning = FALSE}
+# Read and clean the dataset
+homicide_data <- read_csv("homicide-data.csv", 
+                          na = c("NA", ".", "")) %>% 
+  janitor::clean_names() %>% 
+  mutate(city_state = str_c(city, state, sep = ", ")) %>% 
+  mutate(unsolved_homicides = disposition %in% 
+           c("Closed without arrest", "Open/No arrest"))
+
+# summarize within cities to obtain the total number of homicides 
+# and the number of unsolved homicides
+homicide_summary <- homicide_data %>% 
+  group_by(city_state) %>% 
+  summarize(total_homicides = n(), 
+          unsolved_homicides = sum(unsolved_homicides, na.rm = TRUE))
+
+knitr::kable(head(homicide_summary, 10), 
+             col.names = c("City, State", "Total Homicides", "Unsolved Homicides"))
+```
+
+The raw data consists of 52,179 observations and 12 variables. The dataset provides detailed information about homicide incidents across various cities and states in the United States, including the victims' personal details, geographic information, and case outcomes. The variables include attributes such as `reported_date`, `victim_first`, `city`, `state`, and `disposition`.
+
+## (b)
+```{r message = FALSE, warning = FALSE}
+# Clean the dataset
+baltimore <- homicide_data %>%
+  filter(city_state == "Baltimore, MD")
+
+# Calculate total homicides and unsolved homicides in Baltimore
+total_homicides <- nrow(baltimore)
+unsolved_homicides <- baltimore %>% 
+  pull(unsolved_homicides) %>% 
+  sum(na.rm = TRUE)
+
+# Perform the proportion test and use broom::tidy to clean the output
+prop_test_baltimore <- prop.test(x = unsolved_homicides, n = total_homicides) %>% 
+  broom::tidy()
+
+knitr::kable(prop_test_baltimore, digits = 3)
+```
