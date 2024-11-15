@@ -1,0 +1,14 @@
+---
+title: "p8105_hw5_dl3757"
+author: "Dang Lin dl3757"
+date: "2024-11-15"
+output: github_document
+---
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+
+set.seed(3757)
+```
+
+
