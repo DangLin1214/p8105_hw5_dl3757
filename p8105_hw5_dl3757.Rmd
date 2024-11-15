@@ -119,3 +119,31 @@ ggplot(power_results, aes(x = true_mu, y = power)) +
 ```
 
 The power increases as the effect size grows, indicating that a larger effect size makes it easier for the t-test to distinguish the true mean from the null hypothesis.
+
+## (c)
+```{r message = FALSE, warning = FALSE}
+# Make a plot of Average Estimate of Mu vs. True Mu by comparing different samples
+simulate_results_df_2 %>%
+  group_by(true_mu) %>%
+  summarize(
+    average_mu = mean(estimate),
+    average_mu_rejected = mean(estimate[p.value < alpha])
+  ) %>% 
+  ggplot(aes(x = true_mu)) + 
+  geom_line(aes(y = average_mu, color = "All Samples")) + 
+  geom_point(aes(y = average_mu, color = "All Samples")) + 
+  geom_line(aes(y = average_mu_rejected, color = "Samples for Null was Rejected")) + 
+  geom_point(aes(y = average_mu_rejected, color = "Samples for Null was Rejected")) + 
+  scale_color_manual(
+    name = "Group",  
+    values = c("All Samples" = "pink", "Samples for Null was Rejected" = "skyblue"),  
+  ) +
+  labs(
+    title = "Average Estimate of Mu vs. True Mu",
+    x = expression("True Value of " * mu),
+    y = expression("Average Estimate of " * mu)
+  ) +
+  theme_minimal()
+```
+
+By comparing the two lines in the plot above, it is clear that the sample average of estimated $\mu$ across tests where the null hypothesis was rejected is not approximately equal to the true value of $\mu$. The line representing the sample average of estimated $\mu$ for tests where the null hypothesis was rejected is slightly higher than the average estimate of $\mu$ for the samples when the true value of $\mu$ is 1, 2, 3, and 4. This occurs because the samples where the null hypothesis was rejected tend to have higher estimates of  $\mu$. In these cases, the 95% confidence intervals of these samples generally do not include 0, pulling their average estimate of $\mu$ farther from 0. Consequently, the samples that reject the null hypothesis have a higher average estimate of $\mu$.
