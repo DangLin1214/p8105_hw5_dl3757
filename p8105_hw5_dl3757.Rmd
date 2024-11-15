@@ -28,3 +28,27 @@ birthday_sim = function(n) {
 knitr::kable(birthday_sim(10), col.name = "Return Result", 
              caption = "Group Size of 10")
 ```
+
+```{r}
+# Run the function 10000 times for each group size between 2 and 50
+sim_res = 
+  expand_grid(
+    n = 2:50,
+    iter = 1:10000
+  ) %>% 
+  mutate(res = map_lgl(n, birthday_sim)) %>%
+  group_by(n) %>% 
+  summarize(prob = mean(res))
+
+# Make a plot showing the probability as a function of group size
+sim_res %>%
+  ggplot(aes(x = n, y = prob )) + 
+  geom_line() + 
+  labs(
+    title = "Probability of Shared Birthday vs. Group Size", 
+    x = "Group Size",
+    y = "Probability") +
+  theme_minimal()
+```
+
+From the plot, it can be observed that the probability of at least two people sharing a birthday increases as the group size grows. When the group size is small, the probability increases gradually. However, as the group size becomes larger, the probability rises more rapidly. Eventually, the probability approaches 1 as the group size becomes sufficiently large.
