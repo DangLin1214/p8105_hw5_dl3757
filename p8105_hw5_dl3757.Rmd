@@ -159,7 +159,7 @@ homicide_data <- read_csv("homicide-data.csv",
   mutate(unsolved_homicides = disposition %in% 
            c("Closed without arrest", "Open/No arrest"))
 
-# summarize within cities to obtain the total number of homicides 
+# Summarize within cities to obtain the total number of homicides 
 # and the number of unsolved homicides
 homicide_summary <- homicide_data %>% 
   group_by(city_state) %>% 
@@ -189,4 +189,33 @@ prop_test_baltimore <- prop.test(x = unsolved_homicides, n = total_homicides) %>
   broom::tidy()
 
 knitr::kable(prop_test_baltimore, digits = 3)
+```
+
+## (c)
+```{r message = FALSE, warning = FALSE}
+# Perform the proportion test for each city
+city_proportions <- homicide_summary %>%
+  mutate(
+    prop_test_result = map2(unsolved_homicides, total_homicides, ~ prop.test(.x, .y)),
+    tidy_result = map(prop_test_result, broom::tidy) 
+  ) %>%
+  unnest(tidy_result) %>%
+  select(city_state, estimate, conf.low, conf.high)
+```
+
+## (d)
+```{r message = FALSE, warning = FALSE}
+# Create a plot that shows the estimates and CIs for each city
+city_proportions %>%
+  mutate(city_state = fct_reorder(city_state, estimate)) |> 
+  ggplot(aes(x = city_state, y = estimate)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) + 
+  labs(
+    title = "Estimated Proportions of Unsolved Homicides by Cities",
+    x = "City, State",
+    y = "Estimated Proportion"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
 ```
