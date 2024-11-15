@@ -11,4 +11,20 @@ library(tidyverse)
 set.seed(3757)
 ```
 
+# Problem 1
+```{r message = FALSE, warning = FALSE}
+# Write a function to check if there are duplicate birthdays in a group
+birthday_sim = function(n) {
 
+  bdays = sample(1:365, size = n, replace = TRUE)
+  
+  duplicate = length(unique(bdays)) < n
+
+  return(duplicate)
+  
+}
+
+# Check whether there are duplicate birthdays in a group of 10 people
+knitr::kable(birthday_sim(10), col.name = "Return Result", 
+             caption = "Group Size of 10")
+```
