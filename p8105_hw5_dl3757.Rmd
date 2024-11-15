@@ -3,6 +3,9 @@ title: "p8105_hw5_dl3757"
 author: "Dang Lin dl3757"
 date: "2024-11-15"
 output: github_document
+output: 
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r message = FALSE, warning = FALSE}
@@ -152,7 +155,7 @@ By comparing the two lines in the plot above, it is clear that the sample averag
 ## (a)
 ```{r message = FALSE, warning = FALSE}
 # Read and clean the dataset
-homicide_data <- read_csv("homicide-data.csv", 
+homicide_data <- read_csv("./homicide-data.csv", 
                           na = c("NA", ".", "")) %>% 
   janitor::clean_names() %>% 
   mutate(city_state = str_c(city, state, sep = ", ")) %>% 
