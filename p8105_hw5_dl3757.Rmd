@@ -52,3 +52,41 @@ sim_res %>%
 ```
 
 From the plot, it can be observed that the probability of at least two people sharing a birthday increases as the group size grows. When the group size is small, the probability increases gradually. However, as the group size becomes larger, the probability rises more rapidly. Eventually, the probability approaches 1 as the group size becomes sufficiently large.
+
+# Problem 2
+## (a)
+```{r message = FALSE, warning = FALSE}
+# Set parameters
+n <- 30
+sigma <- 5 
+mu <- 0
+alpha <- 0.05
+iterations <- 5000
+
+# Write a function that return t test results
+simulate_t_test <- function(n, mu, sigma) {
+  simulate_data <- rnorm(n, mean = mu, sd = sigma)
+  
+  t_test_results <- t.test(simulate_data, mu = 0) %>% 
+    broom::tidy() %>% 
+    select(estimate = estimate, 
+           p.value = p.value)
+  
+  return(t_test_results)
+}
+
+# Generate 5000 datasets from the model
+simulate_results_df_1 <- 
+  expand_grid(
+  true_mu = mu,
+  iter = 1:iterations) %>%
+  mutate(
+    result = map(true_mu, ~ simulate_t_test(n, .x, sigma))
+  ) %>%
+  unnest(result)
+
+# Create a table with head 10 simulations
+knitr::kable(head(simulate_results_df_1, 10), 
+             col.names = c("True Mu", "Iterations", 
+                           "Estimate", "P-value"))
+```
