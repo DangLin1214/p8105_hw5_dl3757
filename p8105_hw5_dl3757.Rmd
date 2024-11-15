@@ -90,3 +90,32 @@ knitr::kable(head(simulate_results_df_1, 10),
              col.names = c("True Mu", "Iterations", 
                            "Estimate", "P-value"))
 ```
+
+## (b)
+```{r message = FALSE, warning = FALSE}
+# Run simulations for different mu values
+simulate_results_df_2 <- 
+  expand_grid(
+  true_mu = c(1, 2, 3, 4, 5, 6),
+  iter = 1:iterations) %>%
+  mutate(
+    result = map(true_mu, ~ simulate_t_test(n, .x, sigma))
+  ) %>%
+  unnest(result)
+
+# Calculate power for each mu value
+power_results <- simulate_results_df_2 %>%
+  group_by(true_mu) %>%
+  summarize(power = mean(p.value < alpha))
+
+# Make a plot showing the proportion of times the null was rejected
+ggplot(power_results, aes(x = true_mu, y = power)) +
+  geom_line() +
+  geom_point() + 
+  labs(title = "Power of One-Sample t-Test vs. True Mu",
+       x = expression("True Value of " * mu),
+       y = "Power") +
+  theme_minimal()
+```
+
+The power increases as the effect size grows, indicating that a larger effect size makes it easier for the t-test to distinguish the true mean from the null hypothesis.
